@@ -44,3 +44,4 @@ Like more damage, more exp
 Achievement system - getting certain amount of food, getting certain amount of something, getting weapons
 
 *If you have any ideas and changes you would like to make, tell me.*
+*When editing code make, make a pull request - don't just commit directly to main branch*
