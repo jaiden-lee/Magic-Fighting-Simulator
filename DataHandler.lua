@@ -21,7 +21,7 @@ local ProfileStore = ProfileService.GetProfileStore(
 local Profiles = {}
 
 local function PlayerAdded (player)
-  local profile = ProfileStore:LoadProfileAsync("Player_"..player.UserId)
+  local profile = ProfileStore:LoadProfileAsync("Player_"..player.UserId, "Force Load")
   if profile ~= nil then -- this will return nil if another server is has the data loaded at same time - basically it is session locked; we should kick player so no data issues
     profile:AddUserId(player.UserId) -- idk why we need this, apparently for some European Law w/ data tracking
     profile:Reconcile() -- fills in missing variables from ProfileTemplate if missing in current profile
