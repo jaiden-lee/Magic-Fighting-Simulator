@@ -1,3 +1,8 @@
+local DataHandler = {}
+
+local SpellBook = require(game.ServerScriptService.SpellBookClass)
+
+
 local ProfileTemplate = {
   Rank = 1,
   SpellBooksOwned = {},
@@ -57,3 +62,97 @@ Players.PlayerRemoving:Connect(function(player)
     print(player.Name.."'s Profile has been released")
   end
 end) 
+
+-- Updating Player Data Functions
+
+
+-- Get Methods
+function DataHandler.GetSouls (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.Souls
+  end
+  return nil
+end
+
+function DataHandler.GetRank (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.Rank
+  end
+  return nil
+end
+
+function DataHandler.GetSpellBooksOwned (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.SpellBooksOwned
+  end
+  return nil
+end
+
+function DataHandler.GetSpellBooksEquipped (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.SpellBooksEquipped
+  end
+  return nil
+end
+
+function DataHandler.GetHoursPlayed (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.HoursPlayed
+  end
+  return nil
+end
+
+function DataHandler.GetCrystals (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.Crystals
+  end
+  return nil
+end
+
+function DataHandler.GetLastTimeLoggedIn (player)
+  local profile = Profiles[player]
+  if profile then
+    return profile.LastTimeLoggedIn
+  end
+  return nil
+end
+
+-- Set Methods
+function DataHandler.UpdateSouls (player, amount)
+  local profile = Profiles[player]
+  if profile then
+    profile.Souls += amount -- this will change w/ multiplier later
+  end
+end
+
+function DataHandler.UpdateCrystals (player, amount)
+  local profile = Profiles[player]
+  if profile then
+    profile.Crystals += amount -- this will change w/ multiplier later
+  end
+end
+
+function DataHandler.SetLastTimePlayed (player)
+  local profile = Profiles[player]
+  if profile then
+    profile.LastTimeLoggedIn = os.time()
+  end
+end
+
+function DataHandler.AddSpellBook (player, bookName)
+  local spellBook = SpellBook.new(bookName)
+  local profile = Profiles[Player]
+  if profile then
+    table.insert(profile.SpellBooksOwned, spellBook)
+  end
+end
+
+
+
+return DataHandler
