@@ -143,9 +143,17 @@ local function closeBottomButtons ()
 	relicsButton.Size = UDim2.new(animationList["relicsButton"][6], 0, animationList["relicsButton"][7], 0)
 	indexButton.Size = UDim2.new(animationList["indexButton"][6], 0, animationList["indexButton"][7], 0)
 	tradeButton.Size = UDim2.new(animationList["tradeButton"][6], 0, animationList["tradeButton"][7], 0)
-
-
 end
+
+
+local closeMenuFunctions = {}
+local function closeOtherMenus ()
+	for i, v in pairs(closeMenuFunctions) do
+		v()
+	end
+end
+
+
 
 local function openInventory ()
 	inventory.Visible = true
@@ -158,19 +166,20 @@ local function closeInventory ()
 	inventory.Position = UDim2.new(.5, 0, .45, 0)
 	inventory.Size = UDim2.new(.4, 0, .55, 0)
 end
+table.insert(closeMenuFunctions, closeInventory)
 
-inventoryButton.MouseButton1Click:Connect(function()
-	if bottomBarOpened == false then
-		currentBottomSelected = "Inventory"
-		openBottomButtons()
-		openInventory()
-	else 
-		if currentBottomSelected == "Inventory" then
-			closeBottomButtons()
-			closeInventory()
-			return
-		end
+
+inventoryButton.MouseButton1Click:Connect(function()	
+	if bottomBarOpened == true and currentBottomSelected == "Inventory" then
+		closeBottomButtons()
+		closeInventory()
+		return
 	end
+	
+	closeOtherMenus()
+	currentBottomSelected = "Inventory"
+	openBottomButtons()
+	openInventory()
 end)
 
 closeInventoryButton.MouseButton1Click:Connect(function()
