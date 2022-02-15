@@ -3,8 +3,12 @@ local UIAnimations = require(game.ReplicatedStorage:WaitForChild("UIAnimations")
 local main = script.Parent:WaitForChild("Main")
 local leftButtons = main:WaitForChild("Left")
 local bottomButtons = main:WaitForChild("Bottom")
+local rightUI = main:WaitForChild("Right")
 local UIS = game:GetService("UserInputService")
+local menus = script.Parent:WaitForChild("Menus")
 
+-- Menus
+local inventory = menus.Inventory
 
 -- Left Buttons
 
@@ -20,6 +24,21 @@ local relicsButton = bottomButtons.Relics
 local indexButton = bottomButtons.Index
 local tradeButton = bottomButtons.Trade
 
+-- Right UI
+local soulsBar = rightUI.Souls
+local levelBar = rightUI.LevelBar
+local runesBar = rightUI.Runes
+
+local soulsAddButton = soulsBar.AddButton
+local runesAddButton = runesBar.AddButton
+
+-- Inventory
+local closeInventoryButton = inventory.Close
+local bottomInventoryBar = inventory.Bottom
+local inventoryDeleteButton = bottomInventoryBar.Delete
+local inventoryEquipBestButton = bottomInventoryBar.EquipBest
+local inventoryUnequipAllButton = bottomInventoryBar.UnequipAll
+local inventorySearchBox = bottomInventoryBar.SearchBox
 
 -- UI Animations --> format = {default X, default Y, enterX, enterY, length, clickX, clickY}
 local animationList = {
@@ -30,7 +49,13 @@ local animationList = {
 	["achievementsButton"] = {.15, 1, .165, 1.1, .05, .13, .9},
 	["relicsButton"] = {.15, 1, .165, 1.1, .05, .13, .9},
 	["indexButton"] = {.15, 1, .165, 1.1, .05, .13, .9},
-	["tradeButton"] = {.15, 1, .165, 1.1, .05, .13, .9}
+	["tradeButton"] = {.15, 1, .165, 1.1, .05, .13, .9},
+	["soulsAddButton"] = {.17,.75, .2, .8, .05, .15, .7},
+	["runesAddButton"] = {.17,.75, .2, .8, .05, .15, .7},
+	["closeInventoryButton"] = {.15, .15, .17, .17, .05, .13, .13},
+	["inventoryDeleteButton"] = {.17, .9, .2, 1, .05, .15, .85},
+	["inventoryEquipBestButton"] = {.17, .6, .18, .7, .05, .15, .55},
+	["inventoryUnequipAllButton"] = {.17, .6, .18, .7, .05, .15, .55}
 }
 local buttons = {
 	["robuxShopButton"] = robuxShopButton,
@@ -40,7 +65,13 @@ local buttons = {
 	["achievementsButton"] = achievementsButton,
 	["relicsButton"] = relicsButton,
 	["indexButton"] = indexButton,
-	["tradeButton"] = tradeButton
+	["tradeButton"] = tradeButton,
+	["soulsAddButton"] = soulsAddButton,
+	["runesAddButton"] = runesAddButton,
+	["closeInventoryButton"] = closeInventoryButton,
+	["inventoryDeleteButton"] = inventoryDeleteButton,
+	["inventoryEquipBestButton"] = inventoryEquipBestButton,
+	["inventoryUnequipAllButton"] = inventoryUnequipAllButton
 }
 local hoverSound = script.Parent.HoverSound
 local buttonDownSound = script.Parent.ButtonDownSound
@@ -52,13 +83,17 @@ for UIElement, properties in pairs(animationList) do
 		buttons[UIElement].MouseEnter:Connect(function()
 			hoverSound:Play()
 			UIAnimations.ChangeSizeAnimation(buttons[UIElement], properties[3], properties[4], properties[5])
-			buttons[UIElement].Title.Visible = true	
+			if buttons[UIElement]:FindFirstChild("Title") then
+				buttons[UIElement].Title.Visible = true	
+			end
 		end)
 		
 	end
 	buttons[UIElement].MouseLeave:Connect(function()
 		UIAnimations.ChangeSizeAnimation(buttons[UIElement], properties[1], properties[2], properties[5])
-		buttons[UIElement].Title.Visible = false
+		if buttons[UIElement]:FindFirstChild("Title") then
+			buttons[UIElement].Title.Visible = false
+		end
 	end)
 	buttons[UIElement].MouseButton1Down:Connect(function()
 		UIAnimations.ChangeSizeAnimation(buttons[UIElement], properties[6], properties[7], properties[5])
@@ -112,14 +147,33 @@ local function closeBottomButtons ()
 
 end
 
+local function openInventory ()
+	inventory.Visible = true
+	UIAnimations.ChangeSizeAnimation(inventory, .5, .65, .075)
+	UIAnimations.ChangePositionAnimation(inventory, .5, .4, .125, "Linear")
+end
+
+local function closeInventory ()
+	inventory.Visible = false
+	inventory.Position = UDim2.new(.5, 0, .45, 0)
+	inventory.Size = UDim2.new(.4, 0, .55, 0)
+end
+
 inventoryButton.MouseButton1Click:Connect(function()
 	if bottomBarOpened == false then
 		currentBottomSelected = "Inventory"
 		openBottomButtons()
+		openInventory()
 	else 
 		if currentBottomSelected == "Inventory" then
 			closeBottomButtons()
+			closeInventory()
 			return
 		end
 	end
+end)
+
+closeInventoryButton.MouseButton1Click:Connect(function()
+	closeBottomButtons()
+	closeInventory()
 end)
