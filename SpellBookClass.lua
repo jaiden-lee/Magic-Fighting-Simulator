@@ -16,4 +16,6 @@ function SpellBook.new (spellName)
 	return newBook
 end
 
+return SpellBook
+
 -- functions: none for now
