@@ -1,7 +1,7 @@
 local DataHandler = {}
 
 local SpellBook = require(game.ServerScriptService.SpellBookClass)
-
+local constants = require(game.ReplicatedStorage.Constants)
 
 local ProfileTemplate = {
 	Rank = 1,
@@ -9,7 +9,7 @@ local ProfileTemplate = {
 	SpellBooksEquipped = 0, -- this is a count; equipped will be at front of the table
 	HoursPlayed = 0,
 	Souls = 0,
-	Crystals = 0,
+	Runes = 0,
 	LastTimeLoggedIn = 0 -- daily reward system
 }
 
@@ -36,7 +36,6 @@ local function PlayerAdded (player)
 			-- if player still in game, then kick basically
 			player:Kick()
 		end)
-
 		if player:IsDescendantOf(Players) then -- makes sure that the player is still in game
 			Profiles[player] = profile
 		else
@@ -53,7 +52,7 @@ for _, player in ipairs(Players:GetPlayers()) do
 	-- just want this to run asynchronously so that the player added event below can run
 end
 
-game.PlayersAdded:Connect(PlayerAdded) -- the player argument automatically passed into here
+Players.PlayerAdded:Connect(PlayerAdded) -- the player argument automatically passed into here
 
 Players.PlayerRemoving:Connect(function(player)
 	local profile = Profiles[player]
@@ -70,7 +69,7 @@ end)
 function DataHandler.GetSouls (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.Souls
+		return profile.Data.Souls
 	end
 	return nil
 end
@@ -78,7 +77,7 @@ end
 function DataHandler.GetRank (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.Rank
+		return profile.Data.Rank
 	end
 	return nil
 end
@@ -86,7 +85,7 @@ end
 function DataHandler.GetSpellBooksOwned (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.SpellBooksOwned
+		return profile.Data.SpellBooksOwned
 	end
 	return nil
 end
@@ -94,7 +93,7 @@ end
 function DataHandler.GetSpellBooksEquipped (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.SpellBooksEquipped
+		return profile.Data.SpellBooksEquipped
 	end
 	return nil
 end
@@ -102,15 +101,15 @@ end
 function DataHandler.GetHoursPlayed (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.HoursPlayed
+		return profile.Data.HoursPlayed
 	end
 	return nil
 end
 
-function DataHandler.GetCrystals (player)
+function DataHandler.GetRunes (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.Crystals
+		return profile.Data.Runes
 	end
 	return nil
 end
@@ -118,7 +117,7 @@ end
 function DataHandler.GetLastTimeLoggedIn (player)
 	local profile = Profiles[player]
 	if profile then
-		return profile.LastTimeLoggedIn
+		return profile.Data.LastTimeLoggedIn
 	end
 	return nil
 end
@@ -127,32 +126,98 @@ end
 function DataHandler.UpdateSouls (player, amount)
 	local profile = Profiles[player]
 	if profile then
-		profile.Souls += amount -- this will change w/ multiplier later
+		profile.Data.Souls += amount -- this will change w/ multiplier later
 	end
 end
 
-function DataHandler.UpdateCrystals (player, amount)
+function DataHandler.UpdateRunes (player, amount)
 	local profile = Profiles[player]
 	if profile then
-		profile.Crystals += amount -- this will change w/ multiplier later
+		profile.Data.Runes += amount -- this will change w/ multiplier later
 	end
 end
 
 function DataHandler.SetLastTimePlayed (player)
 	local profile = Profiles[player]
 	if profile then
-		profile.LastTimeLoggedIn = os.time()
+		profile.Data.LastTimeLoggedIn = os.time()
 	end
 end
 
 function DataHandler.AddSpellBook (player, bookName)
+	print("hi")
 	local spellBook = SpellBook.new(bookName)
 	local profile = Profiles[player]
 	if profile then
-		table.insert(profile.SpellBooksOwned, spellBook)
+		table.insert(profile.Data.SpellBooksOwned, spellBook)
 	end
 end
 
+-- can only delete spell books that aren't equipped
+function DataHandler.RemoveSpellBook (player, bookName, bookLevel)
+	local profile = Profiles[player]
+	if profile then
+		local inventory = profile.Data.SpellBooksOwned
+		for i = profile.Data.SpellBooksEquipped+1, #inventory, 1 do
+			local book = inventory[i]
+			if book.Name == bookName and book.Level == bookLevel then
+				table.remove(inventory, i)
+				return
+			end
+		end
+	end
+end
+
+function DataHandler.EquipSpellBook (player, bookName, bookLevel)
+	local profile = Profiles[player]
+	if profile then
+		local inventory = profile.Data.SpellBooksOwned
+		for i = profile.Data.SpellBooksEquipped+1, #inventory, 1 do
+			local book = inventory[i]
+			if book.Name == bookName and book.Level == bookLevel then
+				-- this means we have found the book to equip
+				local temp = inventory[profile.Data.SpellBooksEquipped+1]
+				inventory[profile.Data.SpellBooksEquipped+1] = book
+				inventory[i] = temp
+				profile.Data.SpellBooksEquipped+=1
+				book.Equipped = true
+				return
+			end
+		end
+	end
+end
+
+function DataHandler.UnequipSpellBook (player, bookName, bookLevel)
+	local profile = Profiles[player]
+	if profile then
+		local inventory = profile.Data.SpellBooksOwned
+		for i = 1, profile.Data.SpellBooksEquipped, 1 do
+			local book = inventory[i]
+			if book.Name == bookName and book.Level == bookLevel then
+				-- this means we have found the book to equip
+				table.insert(inventory, book)
+				table.remove(inventory, i)
+				
+				profile.Data.SpellBooksEquipped -= 1
+				
+				book.Equipped = false
+				return
+			end
+		end
+	end
+end
+
+-- returns true if the player has enough room in inventory to equip a spell; false otherwise
+function DataHandler.CanEquip (player)
+	local profile = Profiles[player]
+	if profile then
+		local booksEquipped = profile.Data.SpellBooksEquipped
+		if booksEquipped < constants.BASE_SPELLS_EQUIPPED then
+			return true
+		end
+		return false
+	end
+end
 
 
 return DataHandler
