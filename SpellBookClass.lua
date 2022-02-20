@@ -16,6 +16,17 @@ function SpellBook.new (spellName)
 	return newBook
 end
 
+
+--Get
+function SpellBook:getName()
+	return self.Name
+end
+
+function SpellBook:getLevel()
+	return self.Level
+end
+
+
 return SpellBook
 
--- functions: none for now
+-- functions: getName, getLevel
