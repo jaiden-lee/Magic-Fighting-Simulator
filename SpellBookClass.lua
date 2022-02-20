@@ -8,14 +8,14 @@ SpellBook.__mode = "kv"
 function SpellBook.new (spellName)
 	local newBook = {
 		Name = spellName,
-		Level = 1
+		Level = 1,
+		Equipped = false
 	}
-	
+
 	setmetatable(newBook, SpellBook)
-	
+
 	return newBook
 end
 
-return SpellBook
-
 -- functions: none for now
+return SpellBook
