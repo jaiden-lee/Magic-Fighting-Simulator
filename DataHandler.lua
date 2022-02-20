@@ -123,6 +123,12 @@ function DataHandler.GetLastTimeLoggedIn (player)
 	return nil
 end
 
+
+
+
+
+
+
 -- Set Methods
 function DataHandler.UpdateSouls (player, amount)
 	local profile = Profiles[player]
@@ -153,6 +159,18 @@ function DataHandler.AddSpellBook (player, bookName)
 	end
 end
 
-
-
+function DataHandler.RemoveSpellBook (player, bookName)
+	local profile = Profiles[player]
+	if profile then
+		local books = profile.SpellBooksOwned
+		local pos = nil
+		for i=1	,#books do
+  			if books[i].getName() == bookName -- idk if classes' attributes are public
+			pos = i
+			break
+		end
+		table.remove(profile.SpellBooksOwned, [pos])
+	end
+end
+	
 return DataHandler
