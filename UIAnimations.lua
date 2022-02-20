@@ -8,4 +8,13 @@ function anim.ChangePositionAnimation (UIElement, endPositionX, endPositionY, le
 	UIElement:TweenPosition(UDim2.new(endPositionX, 0, endPositionY, 0), "Out", easingStyle, length, true)
 end
 
+function anim.ChangeTextWithOutline (UIElement, text)
+	UIElement.Text = text
+	for i,v in pairs(UIElement:GetChildren()) do
+		if v.Name == "ui-stroke" then
+			v.Text = text
+		end
+	end
+end
+
 return anim
