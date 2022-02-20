@@ -159,18 +159,36 @@ function DataHandler.AddSpellBook (player, bookName)
 	end
 end
 
-function DataHandler.RemoveSpellBook (player, bookName)
+function DataHandler.RemoveSpellBook (player, bookName, bookLevel)
 	local profile = Profiles[player]
 	if profile then
 		local books = profile.SpellBooksOwned
 		local pos = nil
-		for i=1	,#books do
-  			if books[i].getName() == bookName -- idk if classes' attributes are public
+		for i=1, #books do
+  			if (books[i].getName() == bookName and books[i].getLevel() == bookLevel) then -- idk if classes' attributes are public
 			pos = i
 			break
 		end
-		table.remove(profile.SpellBooksOwned, [pos])
+		if (pos != nil) then
+			table.remove(profile.SpellBooksOwned, pos)
+		end
 	end
 end
 	
+	
+function DataHandler.TradeSpellBooks (player1, player2, player1Books, player2Books)
+		local profile1 = Profiles[player1]
+		local profile2 = Profiles[player2]
+		if (profile1 and profile2) then
+			table.insert(profile1.SpellBooksOwned, player2Books)
+			table.insert(profile2.SpellBooksOwned, player1Books)
+			for i=1, #player1Books do
+				book = player1Books[i]
+				DataHandler.RemoveSpellBook(player1, book.getName(), book.getLevel())
+			end
+			for i=1, #player2Books do
+				book = player2Books[i]
+				DataHandler.RemoveSpellBook(player2, book.getName(), book.getLevel())
+			end
+		end
 return DataHandler
