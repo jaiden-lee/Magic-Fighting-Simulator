@@ -145,7 +145,6 @@ function DataHandler.SetLastTimePlayed (player)
 end
 
 function DataHandler.AddSpellBook (player, bookName)
-	print("hi")
 	local spellBook = SpellBook.new(bookName)
 	local profile = Profiles[player]
 	if profile then
@@ -158,6 +157,7 @@ function DataHandler.RemoveSpellBook (player, bookName, bookLevel)
 	local profile = Profiles[player]
 	if profile then
 		local inventory = profile.Data.SpellBooksOwned
+		-- starts at the index after the equipped ones so it searches for those in there
 		for i = profile.Data.SpellBooksEquipped+1, #inventory, 1 do
 			local book = inventory[i]
 			if book.Name == bookName and book.Level == bookLevel then
