@@ -219,5 +219,22 @@ function DataHandler.CanEquip (player)
 	end
 end
 
+function DataHandler.TradeSpellBooks (player1, player2, player1Books, player2Books)
+	local profile1 = Profiles[player1]
+	local profile2 = Profiles[player2]
+	if (profile1 and profile2) then
+		for i=1, #player1Books do
+			book = player1Books[i]
+			table.insert(profile2.SpellBooksOwned, book)
+			DataHandler.RemoveSpellBook(player1, book.getName(), book.getLevel())
+		end
+		for i=1, #player2Books do
+			book = player2Books[i]
+			table.insert(profile1.SpellBooksOwned, book)
+			DataHandler.RemoveSpellBook(player2, book.getName(), book.getLevel())
+		end
+	end
+end	
+
 
 return DataHandler
